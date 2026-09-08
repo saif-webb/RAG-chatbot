@@ -1,0 +1,76 @@
+# Render Blueprint. In the Render dashboard: New -> Blueprint -> pick this repo.
+#
+# ── Why this is not `plan: free` ──────────────────────────────────────────────
+# Render's free instance has 512 MB of RAM. sentence-transformers loads PyTorch
+# plus the MiniLM weights and settles around 400-600 MB resident, before FastAPI
+# and asyncpg. It OOMs on free reliably enough that shipping `plan: free` here
+# would just produce a broken deploy.
+#
+# Options, cheapest first:
+#   1. `plan: starter` (below) — ~$7/mo, 512 MB → 2 GB. Also removes the
+#      15-minute spin-down, so no cold starts.
+#   2. Keep free and switch embeddings to an API (Gemini, Cohere, Jina) so
+#      nothing but the HTTP client lives in memory.
+#   3. Deploy the Dockerfile to Google Cloud Run instead — its always-free tier
+#      allows 1 GB instances, though it requires a billing account.
+#
+# ── Database ─────────────────────────────────────────────────────────────────
+# There is deliberately NO `databases:` block. Render's own free Postgres
+# EXPIRES 30 DAYS after creation and is then deleted with all its data. Create a
+# free Neon project (https://neon.com) and paste its POOLED connection string
+# into DATABASE_URL below, or add a paid Render Postgres yourself.
+
+services:
+  - type: web
+    name: rag-chatbot
+    runtime: python
+    plan: starter
+    region: oregon
+
+    buildCommand: |
+      pip install torch --index-url https://download.pytorch.org/whl/cpu
+      pip install -r backend/requirements.txt
+      python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+    healthCheckPath: /healthz
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      # Persist the model download from the build into the running instance.
+      - key: HF_HOME
+        value: /opt/render/project/.cache/huggingface
+
+      # --- database --------------------------------------------------------
+      # sync: false -> Render prompts for the value and stores it as a secret.
+      - key: DATABASE_URL
+        sync: false
+
+      # --- llm -------------------------------------------------------------
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_CHAT_MODEL
+        value: gemini-2.5-flash-lite
+
+      # --- embeddings ------------------------------------------------------
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+      - key: EMBEDDING_DEVICE
+        value: cpu
+      - key: EMBEDDING_BATCH_SIZE
+        value: "32"
+
+      # --- retrieval -------------------------------------------------------
+      - key: CHUNK_SIZE
+        value: "1000"
+      - key: CHUNK_OVERLAP
+        value: "150"
+      - key: TOP_K
+        value: "8"
+      - key: SIMILARITY_THRESHOLD
+        value: "0.35"
+      - key: MAX_UPLOAD_MB
+        value: "20"
+      - key: LOG_LEVEL
+        value: INFO

@@ -1,0 +1,36 @@
+# Secrets — never commit
+.env
+*.env
+!.env.example
+
+# Runtime data and any local model cache.
+# Ignore the contents but keep the directory structure — a negation cannot
+# rescue a file from inside an ignored *directory*, so each level is listed.
+data/*
+!data/uploads/
+data/uploads/*
+!data/uploads/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

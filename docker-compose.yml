@@ -1,0 +1,31 @@
+# Local Postgres with pgvector already compiled in.
+#
+#   docker compose up -d
+#   DATABASE_URL=postgresql://rag:rag@localhost:5432/rag
+#
+# The app creates its own schema on first boot, so there is nothing else to run.
+# For deployment, drop this and point DATABASE_URL at a managed instance.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: rag-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: rag
+      POSTGRES_DB: rag
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Wait for real readiness — `docker compose up -d` returns before Postgres
+      # is accepting connections, and the app would fail its first boot.
+      test: ["CMD-SHELL", "pg_isready -U rag -d rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
