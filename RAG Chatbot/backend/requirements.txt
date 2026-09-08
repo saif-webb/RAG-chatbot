@@ -1,0 +1,28 @@
+# Web layer
+fastapi>=0.115,<0.150
+uvicorn[standard]>=0.30,<0.60
+python-multipart>=0.0.9,<0.1
+pydantic>=2.7,<3
+pydantic-settings>=2.3,<3
+
+# Postgres + pgvector
+asyncpg>=0.29,<0.31
+pgvector>=0.3,<0.5
+numpy>=1.26,<3
+
+# Embeddings: sentence-transformers/all-MiniLM-L6-v2 (384 dims, ~90 MB weights).
+#
+# This pulls PyTorch — roughly 1 GB installed, and 400-600 MB resident once the
+# model loads. On Linux, install the CPU-only build first to avoid downloading
+# the multi-gigabyte CUDA wheels:
+#
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r backend/requirements.txt
+sentence-transformers>=3.0,<6
+
+# Document loading
+pypdf>=4.2,<7
+python-docx>=1.1,<2
+
+# Gemini chat
+google-genai>=1.0,<2

@@ -1,0 +1,15 @@
+line-length = 90
+target-version = "py310"
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "BLE", "SIM", "C4", "RUF"]
+
+[lint.per-file-ignores]
+# `File(...)`/`Depends(...)` in a signature default is the FastAPI idiom.
+"app/api/*" = ["B008"]
+# Tests assert on broad exceptions on purpose, and a split() word list is more
+# readable than a 40-element literal.
+"tests/*" = ["B017", "SIM905"]
+
+[format]
+quote-style = "double"

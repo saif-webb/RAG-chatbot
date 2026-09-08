@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RAG Chatbot</title>
+  <meta name="description" content="Ask questions about your own documents.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Sidebar: documents ─────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <header class="sidebar-head">
+      <h1>📚 RAG Chatbot</h1>
+      <p class="muted">Answers grounded in your documents.</p>
+    </header>
+
+    <form id="upload-form" class="dropzone" tabindex="0">
+      <input type="file" id="file-input" multiple hidden
+             accept=".pdf,.docx,.txt,.md,.markdown,.rst,.csv,.json">
+      <div class="dropzone-inner">
+        <span class="dropzone-icon">⬆</span>
+        <strong>Drop files or click to upload</strong>
+        <span class="muted small">PDF, DOCX, TXT, MD, CSV, JSON</span>
+      </div>
+    </form>
+
+    <div id="upload-error" class="banner error" hidden></div>
+
+    <section class="doc-section">
+      <div class="doc-head">
+        <h2>Documents</h2>
+        <span id="doc-count" class="pill">0</span>
+      </div>
+      <ul id="doc-list" class="doc-list"></ul>
+      <p id="doc-empty" class="muted small">
+        No documents yet. Upload one to start asking questions.
+      </p>
+    </section>
+
+    <footer class="sidebar-foot">
+      <span id="health" class="muted small">Checking backend…</span>
+    </footer>
+  </aside>
+
+  <!-- ── Main: chat ─────────────────────────────────────────────────── -->
+  <main class="chat">
+    <div id="transcript" class="transcript">
+      <div class="welcome">
+        <h2>Ask a question about your documents</h2>
+        <p class="muted">
+          Every answer cites the passages it came from. If the documents don't
+          cover something, the assistant says so rather than guessing.
+        </p>
+      </div>
+    </div>
+
+    <form id="chat-form" class="composer">
+      <textarea id="chat-input" rows="1" placeholder="Ask something…"
+                autocomplete="off"></textarea>
+      <button type="submit" id="send-btn" title="Send (Enter)">Send</button>
+    </form>
+    <p class="muted small composer-hint">
+      Enter to send · Shift+Enter for a new line
+    </p>
+  </main>
+
+</div>
+
+<script src="/script.js"></script>
+</body>
+</html>
